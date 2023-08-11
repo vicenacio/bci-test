@@ -14,9 +14,18 @@ public class ResponseExceptionHandler extends ResponseEntityExceptionHandler {
     ExceptionResponse ex = new ExceptionResponse(exception.getMessage());
     return new ResponseEntity<>(ex, HttpStatus.CONFLICT);
   }
+
   @ExceptionHandler(UserNotFoundException.class)
-  public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException exception) {
+  public ResponseEntity<ExceptionResponse> handleUserNotFoundException(
+      UserNotFoundException exception) {
     ExceptionResponse ex = new ExceptionResponse(exception.getMessage());
     return new ResponseEntity<>(ex, HttpStatus.NOT_FOUND);
+  }
+
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<ExceptionResponse> handleBadRequestException(
+      BadRequestException exception) {
+    ExceptionResponse ex = new ExceptionResponse(exception.getMessage());
+    return new ResponseEntity<>(ex, HttpStatus.BAD_REQUEST);
   }
 }

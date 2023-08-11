@@ -34,7 +34,7 @@ public class User {
       LocalDateTime lastLogin,
       String token,
       boolean isActive) {
-      this.name = name;
+    this.name = name;
     this.email = email;
     this.password = password;
     this.phones = phones;
@@ -83,5 +83,41 @@ public class User {
 
   public boolean isActive() {
     return isActive;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  public void setPhones(List<Phone> phones) {
+    this.phones = phones;
+  }
+
+  public void setCreated(LocalDateTime created) {
+    this.created = created;
+  }
+
+  public void setModified(LocalDateTime modified) {
+    this.modified = modified;
+  }
+
+  public void setLastLogin(LocalDateTime lastLogin) {
+    this.lastLogin = lastLogin;
+  }
+
+  public void setToken(String token) {
+    this.token = token;
+  }
+
+  public void setActive(boolean active) {
+    isActive = active;
   }
 }

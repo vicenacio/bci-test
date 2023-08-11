@@ -16,11 +16,11 @@ public class Phone {
     public Phone() {
     }
 
-    public Phone(Long id, String number, String cityCode, String countrycode) {
+    public Phone(Long id, String number, String cityCode, String countryCode) {
         this.id = id;
         this.number = number;
         this.cityCode = cityCode;
-        this.countryCode = countrycode;
+        this.countryCode = countryCode;
     }
 
     public Long getId() {
@@ -35,7 +35,7 @@ public class Phone {
         return cityCode;
     }
 
-    public String getCountrycode() {
+    public String getCountryCode() {
         return countryCode;
     }
 }

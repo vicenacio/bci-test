@@ -29,9 +29,22 @@ public class BciTestController {
     return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
   }
 
+  @PutMapping("/updateById/{id}")
+  public ResponseEntity<UserDTO> updateUserById(
+      @PathVariable Long id, @RequestBody UserDTO userDTO) {
+    userService.updateUser(id, userDTO);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
   @DeleteMapping("/deleteById/{id}")
   public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
     userService.deleteUserById(id);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @DeleteMapping("/deleteAll")
+  public ResponseEntity<Void> deleteAllUsers() {
+    userService.deleteAllUsers();
     return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -1,23 +1,23 @@
 package cl.bci.bcitest.util;
 
-import cl.bci.bcitest.exception.GenericException;
+import cl.bci.bcitest.exception.BadRequestException;
+import org.springframework.stereotype.Component;
 
-import java.util.regex.Pattern;
-
+@Component
 public class ValidationUtils {
-    private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$");
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$");
-    public static void validateEmailFormat(final String email) {
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new GenericException("El correo no cumple con el formato correcto.");
-        }
-    }
 
-    public static void validatePasswordFormat(final String password) {
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            throw new GenericException("La contraseña no cumple con el formato correcto.");
-        }
+  public static boolean validateEmailFormat(final String email, final String emailPattern) {
+    if (email.matches(emailPattern)) {
+      return true;
     }
+    throw new BadRequestException("El correo no cumple con el formato correcto.");
+  }
+
+  public static boolean validatePasswordFormat(
+      final String password, final String passwordPattern) {
+    if (password.matches(passwordPattern)) {
+      return true;
+    }
+    throw new BadRequestException("La contraseña no cumple con el formato correcto.");
+  }
 }
