@@ -13,7 +13,7 @@ public class UserMapper {
   public static UserDTO mapResponseForCreateUser(final User user) {
     return new UserDTO(
         user.getId(),
-        null,
+        user.getName(),
         null,
         null,
         null,
@@ -28,8 +28,8 @@ public class UserMapper {
     return new UserDTO(
         user.getId(),
         user.getName(),
-        user.getEmail(),
-        user.getPassword(),
+        null,
+        null,
         userPhones,
         formatDate(user.getCreated()),
         formatDate(user.getModified()),

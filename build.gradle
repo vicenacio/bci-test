@@ -19,10 +19,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.5.2'
-	implementation group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.8', ext: 'pom'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	runtimeOnly 'com.h2database:h2'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'com.auth0:java-jwt:4.3.0'
+
 }
 
 tasks.named('test') {

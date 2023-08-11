@@ -15,7 +15,7 @@ public class BciTestController {
   private final UserService userService;
 
   @Autowired
-  public BciTestController(UserService userService) {
+  public BciTestController(final UserService userService) {
     this.userService = userService;
   }
 

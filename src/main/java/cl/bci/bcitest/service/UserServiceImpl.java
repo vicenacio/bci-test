@@ -10,6 +10,7 @@ import cl.bci.bcitest.repository.PhoneRepository;
 import cl.bci.bcitest.repository.UserRepository;
 import cl.bci.bcitest.repository.dao.Phone;
 import cl.bci.bcitest.repository.dao.User;
+import cl.bci.bcitest.security.JwtUtil;
 import cl.bci.bcitest.service.model.PhoneDTO;
 import cl.bci.bcitest.service.model.UserDTO;
 import java.time.LocalDateTime;
@@ -25,18 +26,24 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final String emailPattern;
   private final String passwordPattern;
+  private final String secret;
   private final PhoneRepository phoneRepository;
+  private final JwtUtil jwtUtil;
 
   @Autowired
   public UserServiceImpl(
       final UserRepository userRepository,
       @Value("${email.pattern}") final String emailPattern,
       @Value("${password.pattern}") final String passwordPattern,
-      final PhoneRepository phoneRepository) {
+      @Value("${jwt.secret}") String secret,
+      final PhoneRepository phoneRepository,
+      JwtUtil jwtUtil) {
     this.userRepository = userRepository;
     this.emailPattern = emailPattern;
     this.passwordPattern = passwordPattern;
+    this.secret = secret;
     this.phoneRepository = phoneRepository;
+    this.jwtUtil = jwtUtil;
   }
 
   @Override
@@ -47,6 +54,8 @@ public class UserServiceImpl implements UserService {
     validateEmailFormat(userDTO.getEmail(), emailPattern);
     validatePasswordFormat(userDTO.getPassword(), passwordPattern);
 
+    final String token = jwtUtil.generateToken(userDTO.getName(), secret);
+
     final User savedUser =
         new User(
             userDTO.getName(),
@@ -56,7 +65,7 @@ public class UserServiceImpl implements UserService {
             LocalDateTime.now(),
             LocalDateTime.now(),
             LocalDateTime.now(),
-            "",
+            token,
             true);
 
     userRepository.save(savedUser);
@@ -80,20 +89,27 @@ public class UserServiceImpl implements UserService {
 
     return mapResponseForGetById(user, userPhones);
   }
+
   @Override
   public void updateUser(final Long id, final UserDTO updatedUser) {
     final User existingUser =
         userRepository
             .findById(id)
             .orElseThrow(() -> new GenericException("El usuario consultado no existe."));
+    final boolean isEmailValid = validateEmailFormat(updatedUser.getEmail(), emailPattern);
+    final boolean isPasswordValid =
+        validatePasswordFormat(updatedUser.getPassword(), passwordPattern);
 
-    existingUser.setName(updatedUser.getName());
-    existingUser.setEmail(updatedUser.getEmail());
-    existingUser.setPassword(updatedUser.getPassword());
-    existingUser.setPhones(getSavedUserPhones(updatedUser));
-    existingUser.setModified(LocalDateTime.now());
-    userRepository.save(existingUser);
+    if (isEmailValid && isPasswordValid) {
+      existingUser.setName(updatedUser.getName());
+      existingUser.setEmail(updatedUser.getEmail());
+      existingUser.setPassword(updatedUser.getPassword());
+      existingUser.setPhones(getSavedUserPhones(updatedUser));
+      existingUser.setModified(LocalDateTime.now());
+      userRepository.save(existingUser);
+    }
   }
+
   @Override
   public void deleteUserById(final Long id) {
     final User user =
@@ -102,10 +118,12 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new GenericException("El usuario consultado no existe."));
     userRepository.deleteById(user.getId());
   }
+
   @Override
   public void deleteAllUsers() {
     userRepository.deleteAll();
   }
+
   private List<Phone> getSavedUserPhones(final UserDTO userDTO) {
     final List<Phone> savedPhones =
         userDTO.getPhones().stream()
