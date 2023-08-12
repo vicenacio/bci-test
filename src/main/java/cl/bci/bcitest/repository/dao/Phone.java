@@ -1,41 +1,45 @@
 package cl.bci.bcitest.repository.dao;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 @Entity
+@Table(name = "app_phone")
 public class Phone {
-    @Id
-    @GeneratedValue
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "phone_id")
+  private Long id;
 
-    private String number;
-    private String cityCode;
-    private String countryCode;
+  private String number;
+  private String cityCode;
+  private String countryCode;
 
-    public Phone() {
-    }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-    public Phone(Long id, String number, String cityCode, String countryCode) {
-        this.id = id;
-        this.number = number;
-        this.cityCode = cityCode;
-        this.countryCode = countryCode;
-    }
+  public Phone() {}
 
-    public Long getId() {
-        return id;
-    }
+  public Phone(Long id, String number, String cityCode, String countryCode) {
+    this.id = id;
+    this.number = number;
+    this.cityCode = cityCode;
+    this.countryCode = countryCode;
+  }
 
-    public String getNumber() {
-        return number;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public String getCityCode() {
-        return cityCode;
-    }
+  public String getNumber() {
+    return number;
+  }
 
-    public String getCountryCode() {
-        return countryCode;
-    }
+  public String getCityCode() {
+    return cityCode;
+  }
+
+  public String getCountryCode() {
+    return countryCode;
+  }
 }

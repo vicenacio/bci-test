@@ -7,16 +7,16 @@ public class PhoneDTO {
   private Long id;
 
   private String number;
-  private String citycode;
-  private String countrycode;
+  private String cityCode;
+  private String countryCode;
 
   public PhoneDTO() {}
 
-  public PhoneDTO(Long id, String number, String citycode, String countrycode) {
+  public PhoneDTO(Long id, String number, String cityCode, String countryCode) {
     this.id = id;
     this.number = number;
-    this.citycode = citycode;
-    this.countrycode = countrycode;
+    this.cityCode = cityCode;
+    this.countryCode = countryCode;
   }
 
   public Long getId() {
@@ -27,11 +27,11 @@ public class PhoneDTO {
     return number;
   }
 
-  public String getCitycode() {
-    return citycode;
+  public String getCityCode() {
+    return cityCode;
   }
 
-  public String getCountrycode() {
-    return countrycode;
+  public String getCountryCode() {
+    return countryCode;
   }
 }

@@ -5,16 +5,19 @@ import java.util.List;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "app_user")
 public class User {
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "user_id")
   private Long id;
 
   private String name;
   private String email;
   private String password;
 
-  @OneToMany private List<Phone> phones;
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "user_id")private List<Phone> phones;
 
   private LocalDateTime created;
   private LocalDateTime modified;

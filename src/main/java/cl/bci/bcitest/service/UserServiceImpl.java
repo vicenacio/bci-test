@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
         userDTO.getPhones().stream()
             .map(
                 phone ->
-                    new Phone(null, phone.getNumber(), phone.getCitycode(), phone.getCountrycode()))
+                    new Phone(null, phone.getNumber(), phone.getCityCode(), phone.getCountryCode()))
             .collect(Collectors.toList());
     return phoneRepository.saveAll(savedPhones);
   }
