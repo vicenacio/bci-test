@@ -5,6 +5,7 @@ import cl.bci.bcitest.service.model.PhoneDTO;
 import cl.bci.bcitest.service.model.UserDTO;
 
 import java.util.List;
+import java.util.Objects;
 
 import static cl.bci.bcitest.util.DateUtils.formatDate;
 
@@ -25,10 +26,23 @@ public class UserMapper {
   }
 
   public static UserDTO mapResponseForGetById(final User user, final List<PhoneDTO> userPhones) {
+    if (Objects.isNull(user.getModified())) {
+      return new UserDTO(
+          user.getId(),
+          user.getName(),
+          user.getEmail(),
+          null,
+          userPhones,
+          formatDate(user.getCreated()),
+          null,
+          formatDate(user.getLastLogin()),
+          user.getToken(),
+          user.isActive());
+    }
     return new UserDTO(
         user.getId(),
         user.getName(),
-        null,
+        user.getEmail(),
         null,
         userPhones,
         formatDate(user.getCreated()),
