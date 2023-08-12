@@ -1,23 +1,26 @@
 package cl.bci.bcitest.service;
 
-import static cl.bci.bcitest.service.UserMapper.mapResponseForCreateUser;
-import static cl.bci.bcitest.service.UserMapper.mapResponseForGetById;
+import static cl.bci.bcitest.service.UserMapper.*;
 import static cl.bci.bcitest.util.ValidationUtils.validateEmailFormat;
 import static cl.bci.bcitest.util.ValidationUtils.validatePasswordFormat;
 
 import cl.bci.bcitest.exception.GenericException;
+import cl.bci.bcitest.exception.UserNotFoundException;
 import cl.bci.bcitest.repository.PhoneRepository;
 import cl.bci.bcitest.repository.UserRepository;
 import cl.bci.bcitest.repository.dao.Phone;
 import cl.bci.bcitest.repository.dao.User;
 import cl.bci.bcitest.security.JwtUtil;
+import cl.bci.bcitest.service.model.LoginDTO;
 import cl.bci.bcitest.service.model.PhoneDTO;
 import cl.bci.bcitest.service.model.UserDTO;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,8 +29,8 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final String emailPattern;
   private final String passwordPattern;
-  private final String secret;
   private final PhoneRepository phoneRepository;
+  private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
 
   @Autowired
@@ -35,15 +38,34 @@ public class UserServiceImpl implements UserService {
       final UserRepository userRepository,
       @Value("${email.pattern}") final String emailPattern,
       @Value("${password.pattern}") final String passwordPattern,
-      @Value("${jwt.secret}") String secret,
       final PhoneRepository phoneRepository,
+      PasswordEncoder passwordEncoder,
       JwtUtil jwtUtil) {
     this.userRepository = userRepository;
     this.emailPattern = emailPattern;
     this.passwordPattern = passwordPattern;
-    this.secret = secret;
     this.phoneRepository = phoneRepository;
+    this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
+  }
+
+  @Override
+  public UserDTO doLogin(final LoginDTO loginDTO) {
+    final User existingUser =
+        userRepository
+            .findByEmail(loginDTO.getEmail())
+            .orElseThrow(() -> new UserNotFoundException("El usuario no está registrado"));
+    if (passwordEncoder.matches(loginDTO.getPassword(), existingUser.getPassword())
+        || !Objects.isNull(loginDTO.getPassword())
+            && existingUser.getPassword().equals(loginDTO.getPassword())) {
+      existingUser.setToken(jwtUtil.generateToken(existingUser.getName()));
+      existingUser.setLastLogin(LocalDateTime.now());
+      userRepository.save(existingUser);
+
+      return mapResponseUser(existingUser);
+    }
+
+    throw new UserNotFoundException("La contraseña no es válida");
   }
 
   @Override
@@ -54,8 +76,6 @@ public class UserServiceImpl implements UserService {
     validateEmailFormat(userDTO.getEmail(), emailPattern);
     validatePasswordFormat(userDTO.getPassword(), passwordPattern);
 
-    final String token = jwtUtil.generateToken(userDTO.getName(), secret);
-
     final User savedUser =
         new User(
             userDTO.getName(),
@@ -63,9 +83,9 @@ public class UserServiceImpl implements UserService {
             userDTO.getPassword(),
             getSavedUserPhones(userDTO),
             LocalDateTime.now(),
-            LocalDateTime.now(),
-            LocalDateTime.now(),
-            token,
+            null,
+            null,
+            null,
             true);
 
     userRepository.save(savedUser);
@@ -73,7 +93,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserDTO getUserById(final Long id) {
+  public UserDTO findUserById(final Long id) {
     final User user =
         userRepository
             .findById(id)
@@ -88,6 +108,13 @@ public class UserServiceImpl implements UserService {
             .collect(Collectors.toList());
 
     return mapResponseForGetById(user, userPhones);
+  }
+
+  @Override
+  public List<UserDTO> findAllUsers() {
+    final List<User> userEntityList = (List<User>) userRepository.findAll();
+
+    return mapUserDTOForFindAll(userEntityList);
   }
 
   @Override
