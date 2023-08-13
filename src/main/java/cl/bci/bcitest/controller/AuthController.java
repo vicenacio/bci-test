@@ -27,7 +27,7 @@ public class AuthController {
     final UserDTO userDTOLogged = userService.doLogin(loginDTO);
 
     final HttpHeaders header = new HttpHeaders();
-    header.add(HttpHeaders.AUTHORIZATION, userDTOLogged.getToken());
+    header.add(HttpHeaders.AUTHORIZATION, userDTOLogged.getAccessToken());
     return ResponseEntity.ok().headers(header).body(userDTOLogged);
   }
 }

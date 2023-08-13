@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Objects;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -31,15 +30,20 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (Objects.isNull(authorizationHeader) || !authorizationHeader.startsWith("Bearer")) {
+    final String requestedUri = request.getRequestURI();
+    if (requestedUri.equals("/auth/login")) {
       filterChain.doFilter(request, response);
+      return;
+    }
+    final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer")) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     final String jwt = authorizationHeader.split(" ")[1].trim();
     final String id = jwtUtil.getIdFromToken(jwt);
     if (!jwtUtil.isTokenValid(jwt)) {
-      filterChain.doFilter(request, response);
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     final User user = (User) userDetailsService.loadUserByUsername(id);

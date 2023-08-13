@@ -17,7 +17,7 @@ public class UserDTO {
   private LocalDateTime created;
   private LocalDateTime modified;
   private LocalDateTime lastLogin;
-  private String token;
+  private String accessToken;
   private boolean isActive;
 
   public UserDTO() {}
@@ -31,7 +31,7 @@ public class UserDTO {
       LocalDateTime created,
       LocalDateTime modified,
       LocalDateTime lastLogin,
-      String token,
+      String accessToken,
       boolean isActive) {
     this.id = id;
     this.name = name;
@@ -41,7 +41,7 @@ public class UserDTO {
     this.created = created;
     this.modified = modified;
     this.lastLogin = lastLogin;
-    this.token = token;
+    this.accessToken = accessToken;
     this.isActive = isActive;
   }
 
@@ -77,8 +77,8 @@ public class UserDTO {
     return lastLogin;
   }
 
-  public String getToken() {
-    return token;
+  public String getAccessToken() {
+    return accessToken;
   }
 
   public boolean isActive() {
