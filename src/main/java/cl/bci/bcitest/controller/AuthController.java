@@ -1,6 +1,5 @@
 package cl.bci.bcitest.controller;
 
-import cl.bci.bcitest.security.JwtUtil;
 import cl.bci.bcitest.service.UserService;
 import cl.bci.bcitest.service.model.LoginDTO;
 import cl.bci.bcitest.service.model.UserDTO;
@@ -26,7 +25,9 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<UserDTO> doLogin(@RequestBody LoginDTO loginDTO) {
     final UserDTO userDTOLogged = userService.doLogin(loginDTO);
+
     final HttpHeaders header = new HttpHeaders();
+    header.add(HttpHeaders.AUTHORIZATION, userDTOLogged.getToken());
     return ResponseEntity.ok().headers(header).body(userDTOLogged);
   }
 }

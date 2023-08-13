@@ -2,11 +2,12 @@ package cl.bci.bcitest.security;
 
 import cl.bci.bcitest.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
 
 @Service
 public class UserSecurityService implements UserDetailsService {
@@ -19,16 +20,13 @@ public class UserSecurityService implements UserDetailsService {
   }
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
     final cl.bci.bcitest.repository.dao.User userEntity =
         userRepository
-            .findByName(username)
+            .findById(Long.valueOf(id))
             .orElseThrow(() -> new UsernameNotFoundException("el usuario no ha sido encontrado."));
 
-    return User.builder()
-        .username(userEntity.getName())
-        .password(userEntity.getPassword())
-        .roles("ADMIN")
-        .build();
+    return new org.springframework.security.core.userdetails.User(
+        userEntity.getName(), userEntity.getPassword(), Collections.emptyList());
   }
 }

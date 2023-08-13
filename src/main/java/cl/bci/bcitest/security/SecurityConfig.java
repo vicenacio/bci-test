@@ -1,5 +1,6 @@
 package cl.bci.bcitest.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -9,9 +10,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
+  private final JwtFilter jwtFilter;
+
+  @Autowired
+  public SecurityConfig(JwtFilter jwtFilter) {
+    this.jwtFilter = jwtFilter;
+  }
 
   @Bean
   public SecurityFilterChain filterChain(final HttpSecurity httpSecurity) throws Exception {
@@ -19,16 +27,12 @@ public class SecurityConfig {
         .csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers(HttpMethod.POST, "/user/*")
-        .hasRole("ADMIN")
-        .antMatchers(HttpMethod.GET, "/user/*/**")
+        .antMatchers(HttpMethod.POST, "/auth/*/**")
         .permitAll()
-        .antMatchers(HttpMethod.DELETE, "/user/deleteById/**", "/user/deleteAll")
-        .hasRole("ADMIN")
         .anyRequest()
         .authenticated()
         .and()
-        .httpBasic();
+        .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class);
 
     return httpSecurity.build();
   }

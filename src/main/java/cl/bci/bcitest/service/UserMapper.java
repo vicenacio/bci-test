@@ -3,7 +3,9 @@ package cl.bci.bcitest.service;
 import cl.bci.bcitest.repository.dao.User;
 import cl.bci.bcitest.service.model.PhoneDTO;
 import cl.bci.bcitest.service.model.UserDTO;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 import static cl.bci.bcitest.util.DateUtils.formatDate;
@@ -55,6 +57,9 @@ public class UserMapper {
   }
 
   public static List<UserDTO> mapUserDTOForFindAll(final List<User> userEntityList) {
+    if (CollectionUtils.isEmpty(userEntityList)) {
+      return Collections.emptyList();
+    }
     return userEntityList.stream()
         .map(
             userEntity -> {

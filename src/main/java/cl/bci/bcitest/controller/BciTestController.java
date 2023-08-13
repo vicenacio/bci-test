@@ -23,7 +23,8 @@ public class BciTestController {
 
   @PostMapping("/create")
   public ResponseEntity<UserDTO> createUserDTO(@RequestBody final UserDTO userDTO) {
-    return new ResponseEntity<>(userService.createUser(userDTO), HttpStatus.CREATED);
+    final UserDTO userDTOCreated = userService.createUser(userDTO);
+    return ResponseEntity.ok().body(userDTOCreated);
   }
 
   @GetMapping("/findById/{id}")

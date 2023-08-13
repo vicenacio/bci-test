@@ -39,8 +39,8 @@ public class UserServiceImpl implements UserService {
       @Value("${email.pattern}") final String emailPattern,
       @Value("${password.pattern}") final String passwordPattern,
       final PhoneRepository phoneRepository,
-      PasswordEncoder passwordEncoder,
-      JwtUtil jwtUtil) {
+      final PasswordEncoder passwordEncoder,
+      final JwtUtil jwtUtil) {
     this.userRepository = userRepository;
     this.emailPattern = emailPattern;
     this.passwordPattern = passwordPattern;
@@ -58,14 +58,14 @@ public class UserServiceImpl implements UserService {
     if (passwordEncoder.matches(loginDTO.getPassword(), existingUser.getPassword())
         || !Objects.isNull(loginDTO.getPassword())
             && existingUser.getPassword().equals(loginDTO.getPassword())) {
-      existingUser.setToken(jwtUtil.generateToken(existingUser.getName()));
+      existingUser.setToken(jwtUtil.generateToken(String.valueOf(existingUser.getId())));
       existingUser.setLastLogin(LocalDateTime.now());
       userRepository.save(existingUser);
 
       return mapResponseUser(existingUser);
     }
 
-    throw new UserNotFoundException("La contraseña no es válida");
+    throw new UserNotFoundException("el usuario no está registrado");
   }
 
   @Override

@@ -17,12 +17,12 @@ public class JwtUtil {
     this.secret = secret;
   }
 
-  public String generateToken(final String userName) {
+  public String generateToken(final String id) {
     return JWT.create()
-        .withSubject(userName)
+        .withSubject(id)
         .withIssuer(secret)
         .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10)))
+        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1)))
         .sign(Algorithm.HMAC256(secret));
   }
 
@@ -35,7 +35,7 @@ public class JwtUtil {
     }
   }
 
-  public String getUserNameFromToken(final String jwt) {
+  public String getIdFromToken(final String jwt) {
     return JWT.require(Algorithm.HMAC256(secret)).build().verify(jwt).getSubject();
   }
 }
