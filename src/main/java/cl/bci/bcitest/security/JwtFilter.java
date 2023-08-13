@@ -37,13 +37,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
     final String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer")) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     final String jwt = authorizationHeader.split(" ")[1].trim();
     final String id = jwtUtil.getIdFromToken(jwt);
     if (!jwtUtil.isTokenValid(jwt)) {
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+      response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     final User user = (User) userDetailsService.loadUserByUsername(id);
