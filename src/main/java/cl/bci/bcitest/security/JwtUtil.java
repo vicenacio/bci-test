@@ -22,7 +22,7 @@ public class JwtUtil {
         .withSubject(id)
         .withIssuer(secret)
         .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(1)))
+        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)))
         .sign(Algorithm.HMAC256(secret));
   }
 

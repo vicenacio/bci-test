@@ -4,6 +4,7 @@ import static cl.bci.bcitest.service.UserMapper.*;
 import static cl.bci.bcitest.util.ValidationUtils.validateEmailFormat;
 import static cl.bci.bcitest.util.ValidationUtils.validatePasswordFormat;
 
+import cl.bci.bcitest.exception.BadRequestException;
 import cl.bci.bcitest.exception.GenericException;
 import cl.bci.bcitest.exception.UserNotFoundException;
 import cl.bci.bcitest.repository.PhoneRepository;
@@ -65,7 +66,7 @@ public class UserServiceImpl implements UserService {
       return mapResponseUser(existingUser);
     }
 
-    throw new UserNotFoundException("el usuario no está registrado");
+    throw new BadRequestException("contraseña invalida.");
   }
 
   @Override
