@@ -3,6 +3,8 @@ package cl.bci.bcitest.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +24,7 @@ public class JwtUtil {
         .withSubject(id)
         .withIssuer(secret)
         .withIssuedAt(new Date())
-        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(5)))
+        .withExpiresAt(new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(3)))
         .sign(Algorithm.HMAC256(secret));
   }
 
@@ -36,6 +38,19 @@ public class JwtUtil {
   }
 
   public String getIdFromToken(final String jwt) {
-    return JWT.require(Algorithm.HMAC256(secret)).build().verify(jwt).getSubject();
+    try {
+      return JWT.require(Algorithm.HMAC256(secret)).build().verify(jwt).getSubject();
+    } catch (JWTVerificationException e) {
+      throw new RuntimeException(e.getMessage());
+    }
+  }
+
+  public boolean isTokenExpired(final String jwt) {
+    try {
+      final DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secret)).build().verify(jwt);
+      return decodedJWT.getExpiresAt().before(new Date());
+    } catch (TokenExpiredException e) {
+      return true;
+    }
   }
 }

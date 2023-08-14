@@ -1,7 +1,10 @@
 package cl.bci.bcitest.security;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -41,17 +44,27 @@ public class JwtFilter extends OncePerRequestFilter {
       return;
     }
     final String jwt = authorizationHeader.split(" ")[1].trim();
-    final String id = jwtUtil.getIdFromToken(jwt);
-    if (!jwtUtil.isTokenValid(jwt)) {
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-      return;
-    }
-    final User user = (User) userDetailsService.loadUserByUsername(id);
-    final UsernamePasswordAuthenticationToken authenticationToken =
-        new UsernamePasswordAuthenticationToken(
-            user.getUsername(), user.getPassword(), Collections.emptyList());
 
-    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-    filterChain.doFilter(request, response);
+    try {
+      if (jwtUtil.isTokenExpired(jwt)) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+      }
+      final String id = jwtUtil.getIdFromToken(jwt);
+      if (!jwtUtil.isTokenValid(jwt)) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        filterChain.doFilter(request, response);
+        return;
+      }
+      final User user = (User) userDetailsService.loadUserByUsername(id);
+      final UsernamePasswordAuthenticationToken authenticationToken =
+          new UsernamePasswordAuthenticationToken(
+              user.getUsername(), user.getPassword(), Collections.emptyList());
+
+      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+      filterChain.doFilter(request, response);
+    } catch (TokenExpiredException | SignatureVerificationException | AccessDeniedException e) {
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
   }
 }
